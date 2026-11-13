@@ -324,6 +324,25 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Close the mobile menu with Escape key or when the screen becomes large
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        setPopupOpen(false);
+      }
+    };
+    const onResize = () => {
+      if (window.innerWidth > 860) setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
   // Hero slider autoplay
   useEffect(() => {
     const timer = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 6500);
@@ -463,12 +482,19 @@ export default function Home() {
             <a href="#contact" className="lt-btn lt-btn--primary lt-nav-cta" onClick={closeMenu}>
               Get a Quote
             </a>
+
+            {/* Visible only inside the mobile menu */}
+            <div className="lt-nav-contact">
+              <span>Need help? Call us</span>
+              <a href="tel:+918387997777">📞 (+91) 8387997777</a>
+            </div>
           </nav>
 
           <button
             className={`lt-burger ${menuOpen ? "lt-burger--open" : ""}`}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
             <span />
             <span />
