@@ -1,321 +1,156 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Home.css";
 
-const BASE = "https://labturnkey.in/img/custome-images-folder";
+/* ------------------------------------------------------------------
+   COMPANY DETAILS - verify these with the company before submitting.
+   Only the fields marked VERIFIED were confirmed from public listings.
+------------------------------------------------------------------- */
+const COMPANY = {
+  name: "Chameza Group",
+  short: "CHAMEZA",
+  tagline: "Laboratory Furniture & Turnkey Lab Infrastructure",
+  city: "Borivali West, Mumbai, Maharashtra 400103, India", // VERIFIED (public listing)
+  phone: "+91 00000 00000", // TODO: replace with the real number
+  phoneHref: "tel:+910000000000", // TODO: replace
+  email: "info@chameza.in", // TODO: confirm the real email
+  website: "https://chameza.in", // VERIFIED
+  heritage: "Backed by Vishal Steel Products, a metal and office furniture manufacturer since 1989.", // VERIFIED
+};
 
-const NAV_LINKS = [
-  { label: "Home", href: "#home", id: "home" },
-  { label: "Services", href: "#services", id: "services" },
-  { label: "Projects", href: "#projects", id: "projects" },
-  { label: "Process", href: "#process", id: "process" },
-  { label: "FAQ", href: "#faq", id: "faq" },
-  { label: "Blog", href: "#blog", id: "blog" },
+const NAV = [
+  { label: "Home", id: "home" },
+  { label: "Capabilities", id: "capabilities" },
+  { label: "Products", id: "products" },
+  { label: "Industries", id: "industries" },
+  { label: "Process", id: "process" },
+  { label: "About", id: "about" },
+  { label: "Contact", id: "contact" },
 ];
 
-const SLIDES = [
-  {
-    tag: "Transforming Businesses Through Innovation",
-    title: "Expert Turnkey Solutions for Your Business Needs",
-    img: `${BASE}/index-12.webp`,
-  },
-  {
-    tag: "Setting the Standard for Quality and Excellence",
-    title: "ISO Certified and Committed to Delivering Exceptional Results",
-    img: `${BASE}/index-13.webp`,
-  },
-  {
-    tag: "Unlocking Your Business Potential",
-    title: "Empowering You to Achieve Greater Heights",
-    img: `${BASE}/index-14.webp`,
-  },
+const FACTS = [
+  { k: "1989", v: "Group heritage in metal furniture manufacturing" },
+  { k: "Design to Handover", v: "One accountable team for the full lab scope" },
+  { k: "Made in India", v: "Manufactured and supplied from Mumbai" },
+  { k: "Safety First", v: "Built around ventilation, chemical resistance and workflow" },
 ];
 
-const TYPED_WORDS = [
-  "Modular Lab Furniture",
-  "Fume Hoods",
-  "Lab Benches",
-  "Turnkey Laboratories",
-  "Research Infrastructure",
-];
-
-// Fixed bubble config so server and client render the same markup
-const BUBBLES = [
-  { left: "6%", size: 18, delay: "0s", dur: "11s" },
-  { left: "16%", size: 34, delay: "2s", dur: "14s" },
-  { left: "28%", size: 14, delay: "5s", dur: "10s" },
-  { left: "41%", size: 26, delay: "1s", dur: "13s" },
-  { left: "55%", size: 40, delay: "4s", dur: "16s" },
-  { left: "67%", size: 16, delay: "7s", dur: "11s" },
-  { left: "78%", size: 30, delay: "3s", dur: "15s" },
-  { left: "90%", size: 22, delay: "6s", dur: "12s" },
-];
-
-const STATS = [
-  { end: 15, suffix: "+", label: "Years of Experience" },
-  { end: 500, suffix: "+", label: "Projects Delivered" },
-  { end: 200, suffix: "+", label: "Happy Clients" },
-  { end: 100, suffix: "%", label: "Safety Compliance" },
-];
-
-const SERVICES = [
+const CAPABILITIES = [
   {
-    icon: "🧪",
-    title: "Turnkey Laboratory Solutions",
-    text: "A seamless experience from conceptualization to completion. Every aspect of your laboratory is meticulously planned, designed and executed to the highest industry standards.",
-    cta: "View Specifications",
+    n: "01",
+    title: "Laboratory Planning & Design",
+    text: "Space planning, bench layouts, utility routing and ventilation planning, prepared as drawings before anything is built.",
+    points: ["Layout and workflow study", "Service points: power, water, gas", "Drawings for client approval"],
   },
   {
-    icon: "🛠️",
-    title: "Dedicated Support Services",
-    text: "Prompt and professional assistance that keeps your laboratory running smoothly, so it is always operational when your research needs it.",
-    cta: "Discover More",
+    n: "02",
+    title: "In-house Manufacturing",
+    text: "Laboratory furniture and fume hoods fabricated from steel and engineered materials, with a manufacturing background that goes back to 1989.",
+    points: ["Steel fabrication", "Worktops and sinks by application", "Custom sizes and modules"],
   },
   {
-    icon: "🛡️",
-    title: "Strategic Planning and Safety",
-    text: "Customized plans that prioritize safety and efficiency, creating a productive work environment that meets the highest industry standards.",
-    cta: "Explore More",
+    n: "03",
+    title: "Installation & Commissioning",
+    text: "Site installation, utility integration and handover handled by a single coordinated team to keep timelines predictable.",
+    points: ["Site coordination", "Utility integration", "Final inspection and handover"],
+  },
+  {
+    n: "04",
+    title: "After-sales Support",
+    text: "Service, modifications and expansion support after handover, so the laboratory keeps working as your research grows.",
+    points: ["Maintenance support", "Layout modifications", "Spare and replacement parts"],
   },
 ];
 
-const PROJECTS = [
-  {
-    title: "Oleo Chemical Laboratory",
-    text: "A state-of-the-art laboratory built for efficiency and compliance.",
-    img: `${BASE}/webp (5).webp`,
-  },
-  {
-    title: "Ayurvedic Pharmaceutical Laboratory",
-    text: "A customized laboratory solution tailored to specific industry requirements.",
-    img: `${BASE}/webp (2).webp`,
-  },
-  {
-    title: "University Educational Laboratory",
-    text: "A cutting-edge environment that fosters innovation and discovery.",
-    img: `${BASE}/webp (1).webp`,
-  },
-  {
-    title: "Research and Technology Laboratory",
-    text: "Exceptional service and support for a research-driven facility.",
-    img: `${BASE}/webp (4).webp`,
-  },
-  {
-    title: "Chemical and Petroleum Processing Laboratory",
-    text: "A compliant and efficient laboratory for complex industries.",
-    img: `${BASE}/webp (3).webp`,
-  },
+const PRODUCTS = [
+  { title: "Modular Laboratory Furniture", text: "Wall benches, island benches and workstations in configurable modules.", tag: "Furniture" },
+  { title: "Fume Hoods", text: "Fume hoods and ventilation-ready work areas for safe handling of chemicals.", tag: "Safety" },
+  { title: "Storage Systems", text: "Cabinets, drawers and chemical and file storage units for organised labs.", tag: "Storage" },
+  { title: "Worktops & Sinks", text: "Worktop and sink options selected for the chemical and heat exposure of the lab.", tag: "Surfaces" },
+  { title: "Turnkey Lab Setups", text: "Complete laboratory fit-outs from concept to handover under one scope.", tag: "Turnkey" },
+  { title: "Office & Pharma Furniture", text: "Metal and office furniture and pharma products from the same manufacturing group.", tag: "Group" },
 ];
 
-const MISSION_POINTS = [
-  "Customized Laboratory Solutions",
-  "Expertise in Laboratory Design and Construction",
-  "Commitment to Quality and Excellence",
-  "Exceptional Customer Service and Support",
+const INDUSTRIES = [
+  { title: "Research & Development", text: "Labs for institutes and company R&D teams." },
+  { title: "Pharmaceutical & QC", text: "Quality control and analytical laboratories." },
+  { title: "Medical & Clinical", text: "Diagnostic and healthcare laboratory spaces." },
+  { title: "Education", text: "College, university and school science laboratories." },
+  { title: "Industrial", text: "Testing and process laboratories inside plants." },
 ];
 
 const PROCESS = [
-  {
-    no: "01",
-    title: "Collaborative Design & Planning",
-    text: "We work closely with you to understand your laboratory's unique requirements and create a customized design that optimizes space, safety and workflow.",
-    img: `${BASE}/design.webp`,
-  },
-  {
-    no: "02",
-    title: "Material Selection & Quality Assurance",
-    text: "We source high-quality materials that meet stringent safety standards, ensuring durability, chemical resistance and regulatory compliance.",
-    img: `${BASE}/process-01.webp`,
-  },
-  {
-    no: "03",
-    title: "Precision Manufacturing & Installation",
-    text: "Our skilled craftsmen manufacture and install your laboratory furniture with care, minimizing downtime and maximizing productivity.",
-    img: `${BASE}/lab16.webp`,
-  },
+  { n: "1", t: "Requirement Study", d: "We understand your lab type, workflow, safety needs and budget." },
+  { n: "2", t: "Design & Drawings", d: "Layouts and utility plans are shared for approval." },
+  { n: "3", t: "Manufacturing", d: "Furniture and fume hoods are fabricated to the approved drawings." },
+  { n: "4", t: "Installation", d: "Site installation with utility integration and inspection." },
+  { n: "5", t: "Handover & Support", d: "Handover with ongoing service and expansion support." },
 ];
 
-const OFFERINGS = [
-  { img: `${BASE}/is1.webp`, sub: "Customizing Lab Layouts", title: "Laboratory Design & Planning" },
-  { img: `${BASE}/is2.webp`, sub: "Sourcing the Best Tools", title: "Equipment Procurement & Installation" },
-  { img: `${BASE}/is3 (1).webp`, sub: "Ensuring Standards", title: "Regulatory Compliance & Certification" },
-  { img: `${BASE}/is3.webp`, sub: "Upskilling Teams", title: "Staff Training & Support" },
-  { img: `${BASE}/is4.webp`, sub: "Streamlining Operations", title: "System Integration & Automation" },
-  { img: `${BASE}/is5.webp`, sub: "Sustaining Excellence", title: "Maintenance & Upgrades" },
+const STANDARDS = [
+  "Chemical-resistant surfaces matched to the application",
+  "Ventilation and fume extraction planned with the layout",
+  "Ergonomic bench heights and clear working clearances",
+  "Utility points placed for safe access and easy servicing",
+  "Layouts that allow future expansion",
 ];
 
-const CLIENT_LOGOS = [1, 2, 3, 4, 5].map((n) => `${BASE}/${n}.webp`);
-
-const FAQS = [
-  {
-    q: "What types of laboratory furniture do you specialize in?",
-    a: "Our expertise spans a wide range of laboratory furniture, including ergonomic workstations, fume hoods, storage solutions and custom designs tailored to the unique needs of your laboratory.",
-  },
-  {
-    q: "How do I initiate a custom laboratory design project?",
-    a: "Simply contact our team with your project requirements, and we will work closely with you to create a bespoke laboratory design that meets your specific needs and enhances your research capabilities.",
-  },
-  {
-    q: "Do your products meet international safety standards?",
-    a: "Yes, our laboratory furniture is designed and manufactured to meet or exceed international safety standards, ensuring a safe and compliant working environment for your researchers and staff.",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    name: "Pranav",
-    role: "CEO & Founder",
-    img: `${BASE}/avatar-08.webp`,
-    text: "We were impressed by the company's commitment to sustainability and eco-friendly practices. Their lab furniture met our high standards and aligned with our values.",
-  },
-  {
-    name: "Shreya",
-    role: "Lab Manager",
-    img: `${BASE}/avatar-11.webp`,
-    text: "Their dedication to understanding our unique needs and providing tailored solutions has been instrumental in our lab's success. A true long-term partner.",
-  },
-  {
-    name: "Santosh",
-    role: "Research Scientist",
-    img: `${BASE}/avatar-16.webp`,
-    text: "Exceptional customer service and support. From the initial consultation to post-installation, they have been responsive, knowledgeable and dedicated.",
-  },
-];
-
-const BLOGS = [
-  {
-    date: "23 Jun, 2023",
-    title: "Unlocking the Potential of Lab Furniture: Strategies for Success",
-    img: `${BASE}/blogbg.webp`,
-  },
-  {
-    date: "20 Jun, 2023",
-    title: "The Future of Lab Design: Trends and Innovations to Watch",
-    img: `${BASE}/blogbg1.webp`,
-  },
-  {
-    date: "18 Jun, 2023",
-    title: "The Benefits of Partnering with a Turnkey Lab Project Company",
-    img: `${BASE}/blogbg2.webp`,
-  },
-];
-
-const MARQUEE_WORDS = [
-  "Excellence in Service",
-  "Unwavering Commitment to Quality",
-  "Customer-Centric Approach",
-  "Regulatory Compliance",
-  "Sustainable Practices",
-  "Innovative Solutions",
-  "Unshakeable Integrity",
-];
-
-/* Counts up from 0 to `end` when the element scrolls into view */
-function Counter({ end, suffix }) {
-  const [value, setValue] = useState(0);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    let frame;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        const duration = 1800;
-        const start = performance.now();
-        const tick = (now) => {
-          const progress = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setValue(Math.floor(eased * end));
-          if (progress < 1) frame = requestAnimationFrame(tick);
-        };
-        frame = requestAnimationFrame(tick);
-      },
-      { threshold: 0.4 }
-    );
-    observer.observe(node);
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(frame);
-    };
-  }, [end]);
-
-  return (
-    <span ref={ref}>
-      {value}
-      {suffix}
-    </span>
-  );
-}
-
-function ContactForm({ id, compact }) {
-  const [sent, setSent] = useState(false);
+function ContactForm({ id }) {
+  const [status, setStatus] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Demo only: connect this to your API / email service
-    setSent(true);
+    const f = new FormData(e.target);
+    const subject = encodeURIComponent(`Project enquiry from ${f.get("name")}`);
+    const body = encodeURIComponent(
+      `Name: ${f.get("name")}\nPhone: ${f.get("phone")}\nEmail: ${f.get("email")}\nProject type: ${f.get("type")}\n\n${f.get("message")}`
+    );
+    // Opens the visitor's mail app. Replace with an API call when a backend is available.
+    window.location.href = `mailto:${COMPANY.email}?subject=${subject}&body=${body}`;
+    setStatus("Your mail app is opening with the enquiry details.");
     e.target.reset();
-    setTimeout(() => setSent(false), 4000);
   };
 
   return (
-    <form className={`lt-form ${compact ? "lt-form--compact" : ""}`} onSubmit={handleSubmit}>
-      <div className="lt-form-row">
-        <input id={`${id}-name`} type="text" placeholder="Your Name *" required />
-        <input id={`${id}-email`} type="email" placeholder="Your Email *" required />
+    <form className="cz-form" onSubmit={handleSubmit}>
+      <div className="cz-form-row">
+        <input id={`${id}-name`} name="name" type="text" placeholder="Your name *" required />
+        <input id={`${id}-phone`} name="phone" type="tel" placeholder="Phone number *" required />
       </div>
-      <input id={`${id}-phone`} type="tel" placeholder="Your Number *" required />
-      <textarea id={`${id}-msg`} rows={compact ? 3 : 5} placeholder="Message *" required />
-      <button type="submit" className="lt-btn lt-btn--primary lt-btn--block">
-        Send Message
-      </button>
-      {sent && <p className="lt-form-success">Thank you! Our team will contact you shortly.</p>}
+      <input id={`${id}-email`} name="email" type="email" placeholder="Email address *" required />
+      <select id={`${id}-type`} name="type" defaultValue="Turnkey laboratory" aria-label="Project type">
+        <option>Turnkey laboratory</option>
+        <option>Laboratory furniture</option>
+        <option>Fume hoods</option>
+        <option>Storage systems</option>
+        <option>Other</option>
+      </select>
+      <textarea id={`${id}-msg`} name="message" rows={4} placeholder="Tell us about your laboratory (size, location, use) *" required />
+      <button type="submit" className="cz-btn cz-btn--primary">Request a Quote</button>
+      {status && <p className="cz-form-status" role="status">{status}</p>}
     </form>
   );
 }
 
 export default function Home() {
-  const [loaded, setLoaded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [activeId, setActiveId] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [slide, setSlide] = useState(0);
-  const [openFaq, setOpenFaq] = useState(0);
-  const [showTop, setShowTop] = useState(false);
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [typed, setTyped] = useState("");
-  // Year is set after mount to avoid reading the current time during prerender
   const [year, setYear] = useState(2026);
 
   useEffect(() => {
     setYear(new Date().getFullYear());
   }, []);
 
-  // Page loader
-  useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 900);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Scroll progress, header shadow, back-to-top and active menu link
+  // Header state and active link
   useEffect(() => {
     const onScroll = () => {
-      const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(max > 0 ? (y / max) * 100 : 0);
-      setScrolled(y > 40);
-      setShowTop(y > 600);
-
+      setScrolled(window.scrollY > 30);
       let current = "home";
-      NAV_LINKS.forEach((link) => {
-        const el = document.getElementById(link.id);
-        if (el && el.getBoundingClientRect().top <= 140) current = link.id;
+      NAV.forEach((n) => {
+        const el = document.getElementById(n.id);
+        if (el && el.getBoundingClientRect().top <= 140) current = n.id;
       });
       setActiveId(current);
     };
@@ -324,17 +159,10 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close the mobile menu with Escape key or when the screen becomes large
+  // Close menu on Escape or when the screen becomes large
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") {
-        setMenuOpen(false);
-        setPopupOpen(false);
-      }
-    };
-    const onResize = () => {
-      if (window.innerWidth > 860) setMenuOpen(false);
-    };
+    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
+    const onResize = () => window.innerWidth > 900 && setMenuOpen(false);
     window.addEventListener("keydown", onKey);
     window.addEventListener("resize", onResize);
     return () => {
@@ -343,571 +171,245 @@ export default function Home() {
     };
   }, []);
 
-  // Hero slider autoplay
-  useEffect(() => {
-    const timer = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 6500);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Typewriter effect
-  useEffect(() => {
-    let wordIndex = 0;
-    let charIndex = 0;
-    let deleting = false;
-    let timer;
-
-    const type = () => {
-      const word = TYPED_WORDS[wordIndex];
-      if (!deleting) {
-        charIndex += 1;
-        setTyped(word.slice(0, charIndex));
-        if (charIndex === word.length) {
-          deleting = true;
-          timer = setTimeout(type, 1600);
-          return;
-        }
-        timer = setTimeout(type, 75);
-      } else {
-        charIndex -= 1;
-        setTyped(word.slice(0, charIndex));
-        if (charIndex === 0) {
-          deleting = false;
-          wordIndex = (wordIndex + 1) % TYPED_WORDS.length;
-          timer = setTimeout(type, 400);
-          return;
-        }
-        timer = setTimeout(type, 38);
-      }
-    };
-
-    timer = setTimeout(type, 900);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Reveal on scroll
   useEffect(() => {
-    const items = document.querySelectorAll(".lt-reveal");
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("lt-in");
-            observer.unobserve(entry.target);
+      (entries) =>
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add("cz-in");
+            observer.unobserve(en.target);
           }
-        });
-      },
+        }),
       { threshold: 0.12 }
     );
-    items.forEach((el) => observer.observe(el));
+    document.querySelectorAll(".cz-reveal").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  // 3D tilt on cards (only on devices that support hover)
   useEffect(() => {
-    if (!window.matchMedia("(hover: hover)").matches) return;
-
-    const onMove = (e) => {
-      const card = e.target.closest(".lt-tilt");
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.setProperty("--ry", `${x * 10}deg`);
-      card.style.setProperty("--rx", `${-y * 10}deg`);
-    };
-    const onLeave = (e) => {
-      const card = e.target.closest && e.target.closest(".lt-tilt");
-      if (!card) return;
-      card.style.setProperty("--ry", "0deg");
-      card.style.setProperty("--rx", "0deg");
-    };
-
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseout", onLeave);
-    return () => {
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseout", onLeave);
-    };
-  }, []);
-
-  // Lock body scroll when mobile menu, popup or loader is open
-  useEffect(() => {
-    document.body.style.overflow = menuOpen || popupOpen || !loaded ? "hidden" : "";
+    document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen, popupOpen, loaded]);
+  }, [menuOpen]);
 
-  const closeMenu = () => setMenuOpen(false);
+  const close = () => setMenuOpen(false);
 
   return (
-    <div className="lt-root">
-      {/* ===== Loader ===== */}
-      <div className={`lt-loader ${loaded ? "lt-loader--hide" : ""}`}>
-        <div className="lt-flask">
-          <span className="lt-flask-liquid" />
-        </div>
-        <p>Preparing your laboratory...</p>
-      </div>
-
-      {/* ===== Scroll progress ===== */}
-      <div className="lt-progress" style={{ width: `${progress}%` }} />
-
-      {/* ===== Top bar ===== */}
-      <div className="lt-topbar">
-        <div className="lt-container lt-topbar-inner">
-          <span>📍 Bangalore, India</span>
-          <a href="tel:+918387997777">📞 (+91) 8387997777</a>
-        </div>
-      </div>
-
-      {/* ===== Header ===== */}
-      <header className={`lt-header ${scrolled ? "lt-header--scrolled" : ""}`}>
-        <div className="lt-container lt-header-inner">
-          <a href="#home" className="lt-logo" onClick={closeMenu}>
-            <img src={`${BASE}/labturnkey-logo.webp`} alt="Labturnkey Logo" />
+    <div className="cz-root">
+      {/* Header */}
+      <header className={`cz-header ${scrolled ? "cz-header--scrolled" : ""}`}>
+        <div className="cz-container cz-header-inner">
+          <a href="#home" className="cz-brand" onClick={close}>
+            <span className="cz-brand-mark">C</span>
+            <span>
+              <strong>{COMPANY.short}</strong>
+              <small>GROUP</small>
+            </span>
           </a>
-
-          <nav className={`lt-nav ${menuOpen ? "lt-nav--open" : ""}`}>
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={activeId === link.id ? "lt-active" : ""}
-                onClick={closeMenu}
-              >
-                {link.label}
+          <nav className={`cz-nav ${menuOpen ? "cz-nav--open" : ""}`} aria-label="Main">
+            {NAV.map((n) => (
+              <a key={n.id} href={`#${n.id}`} className={activeId === n.id ? "cz-active" : ""} onClick={close}>
+                {n.label}
               </a>
             ))}
-            <a href="#contact" className="lt-btn lt-btn--primary lt-nav-cta" onClick={closeMenu}>
+            <a href="#contact" className="cz-btn cz-btn--primary cz-nav-cta" onClick={close}>
               Get a Quote
             </a>
-
-            {/* Visible only inside the mobile menu */}
-            <div className="lt-nav-contact">
-              <span>Need help? Call us</span>
-              <a href="tel:+918387997777">📞 (+91) 8387997777</a>
-            </div>
           </nav>
-
           <button
-            className={`lt-burger ${menuOpen ? "lt-burger--open" : ""}`}
+            className="cz-burger"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
-            <span />
-            <span />
-            <span />
+            <span /><span /><span />
           </button>
         </div>
       </header>
-      {menuOpen && <div className="lt-backdrop" onClick={closeMenu} />}
+      {menuOpen && <div className="cz-backdrop" onClick={close} />}
 
-      {/* ===== Hero slider ===== */}
-      <section id="home" className="lt-hero">
-        {SLIDES.map((s, i) => (
-          <div
-            key={s.title}
-            className={`lt-slide ${i === slide ? "lt-slide--active" : ""}`}
-            style={{
-              backgroundImage: `linear-gradient(135deg, rgba(5,20,50,.9), rgba(0,90,200,.55)), url("${s.img}")`,
-            }}
-          >
-            <div className="lt-container lt-slide-content">
-              <span className="lt-eyebrow lt-eyebrow--light">{s.tag}</span>
-              <h1>{s.title}</h1>
-              <p className="lt-typed">
-                We specialize in: <b>{typed}</b>
-                <i className="lt-caret" />
-              </p>
-              <div className="lt-hero-actions">
-                <a href="#contact" className="lt-btn lt-btn--primary">Get Started</a>
-                <a href="#services" className="lt-btn lt-btn--ghost">Our Services</a>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {/* Floating bubbles */}
-        <div className="lt-bubbles" aria-hidden="true">
-          {BUBBLES.map((b, i) => (
-            <span
-              key={i}
-              style={{
-                left: b.left,
-                width: b.size,
-                height: b.size,
-                animationDelay: b.delay,
-                animationDuration: b.dur,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="lt-dots">
-          {SLIDES.map((s, i) => (
-            <button
-              key={s.title}
-              className={i === slide ? "lt-dot lt-dot--active" : "lt-dot"}
-              onClick={() => setSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
-
-        <a href="#services" className="lt-scroll-hint" aria-label="Scroll down">
-          <span />
-        </a>
-      </section>
-
-      {/* ===== Stats ===== */}
-      <section className="lt-stats">
-        <div className="lt-container lt-stats-grid lt-reveal lt-zoom">
-          {STATS.map((s) => (
-            <div key={s.label} className="lt-stat">
-              <strong>
-                <Counter end={s.end} suffix={s.suffix} />
-              </strong>
-              <span>{s.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== Services ===== */}
-      <section id="services" className="lt-section">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">Our Expertise</span>
-            <h2>Comprehensive Solutions for Laboratory Excellence</h2>
-          </div>
-          <div className="lt-grid lt-grid--3">
-            {SERVICES.map((s, i) => (
-              <article
-                key={s.title}
-                className="lt-card lt-tilt lt-reveal"
-                style={{ transitionDelay: `${i * 120}ms` }}
-              >
-                <div className="lt-card-icon">{s.icon}</div>
-                <h3>{s.title}</h3>
-                <p>{s.text}</p>
-                <a href="#contact" className="lt-link">{s.cta} →</a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Projects ===== */}
-      <section id="projects" className="lt-section lt-section--alt">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">Our Portfolio</span>
-            <h2>Transforming Laboratories Through Innovation</h2>
-          </div>
-          <div className="lt-projects">
-            {PROJECTS.map((p, i) => (
-              <article
-                key={p.title}
-                className={`lt-project lt-reveal lt-zoom ${i === 0 ? "lt-project--wide" : ""}`}
-                style={{ transitionDelay: `${(i % 3) * 100}ms` }}
-              >
-                <img src={p.img} alt={p.title} loading="lazy" />
-                <div className="lt-project-info">
-                  <h3>{p.title}</h3>
-                  <p>{p.text}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Mission ===== */}
-      <section className="lt-section">
-        <div className="lt-container lt-split">
-          <div className="lt-split-media lt-reveal lt-from-left">
-            <img src={`${BASE}/thump3.webp`} alt="Laboratory furniture" loading="lazy" />
-            <img src={`${BASE}/why-choose-02.webp`} alt="Laboratory installation" loading="lazy" />
-            <div className="lt-badge">ISO<br />Certified</div>
-          </div>
-          <div className="lt-split-text lt-reveal lt-from-right">
-            <span className="lt-eyebrow">Our Mission</span>
-            <h2>Transforming Laboratories Through Innovation and Excellence</h2>
+      {/* Hero */}
+      <section id="home" className="cz-hero">
+        <div className="cz-grid-bg" aria-hidden="true" />
+        <div className="cz-container cz-hero-inner">
+          <div className="cz-hero-text">
+            <span className="cz-eyebrow">Mumbai &middot; Laboratory Furniture Manufacturer</span>
+            <h1>
+              Laboratories engineered <em>end to end</em> &mdash; furniture, fume hoods and turnkey infrastructure.
+            </h1>
             <p>
-              We are dedicated to providing high-quality laboratory solutions that meet the unique needs of our
-              clients. Our team is committed to delivering exceptional service, ensuring that every client achieves
-              their goals.
+              {COMPANY.name} designs, manufactures and installs laboratory furniture, fume hoods and complete
+              turnkey laboratory setups for research, pharmaceutical, medical, educational and industrial facilities.
             </p>
-            <ul className="lt-checks">
-              {MISSION_POINTS.map((m, i) => (
-                <li key={m} style={{ "--i": i }}>{m}</li>
-              ))}
-            </ul>
-            <a href="#contact" className="lt-btn lt-btn--primary">Talk to an Expert</a>
+            <div className="cz-hero-actions">
+              <a href="#contact" className="cz-btn cz-btn--primary">Request a Quote</a>
+              <a href="#capabilities" className="cz-btn cz-btn--ghost">Our Capabilities</a>
+            </div>
+          </div>
+
+          {/* CSS-drawn laboratory layout plan, no external images */}
+          <div className="cz-plan" aria-hidden="true">
+            <div className="cz-plan-title">LAB LAYOUT &middot; PLAN VIEW</div>
+            <div className="cz-plan-room">
+              <span className="cz-plan-hood">FH-01</span>
+              <span className="cz-plan-hood cz-plan-hood--b">FH-02</span>
+              <span className="cz-plan-island">ISLAND BENCH</span>
+              <span className="cz-plan-island cz-plan-island--b">ISLAND BENCH</span>
+              <span className="cz-plan-wall">WALL BENCH</span>
+              <span className="cz-plan-store">STORAGE</span>
+              <i className="cz-plan-door" />
+            </div>
+            <div className="cz-plan-foot">Design &rarr; Manufacture &rarr; Install</div>
           </div>
         </div>
       </section>
 
-      {/* ===== Call to action band ===== */}
-      <section className="lt-cta">
-        <div className="lt-container lt-cta-inner lt-reveal">
-          <div>
-            <span className="lt-eyebrow lt-eyebrow--light">Get in Touch</span>
-            <h2>Crafting spaces where science thrives and innovation flourishes</h2>
+      {/* Facts strip */}
+      <section className="cz-facts">
+        <div className="cz-container cz-facts-grid">
+          {FACTS.map((f) => (
+            <div key={f.k} className="cz-fact">
+              <strong>{f.k}</strong>
+              <span>{f.v}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Capabilities */}
+      <section id="capabilities" className="cz-section">
+        <div className="cz-container">
+          <div className="cz-heading cz-reveal">
+            <span className="cz-eyebrow">Engineering Capabilities</span>
+            <h2>One team from first drawing to final handover</h2>
+            <p>Turnkey means a single accountable partner for design, fabrication, installation and support.</p>
           </div>
-          <div className="lt-cta-actions">
-            <a href="tel:+918387997777" className="lt-btn lt-btn--light">📞 (+91) 8387997777</a>
-            <button className="lt-btn lt-btn--ghost" onClick={() => setPopupOpen(true)}>
-              Download Brochure
-            </button>
+          <div className="cz-grid cz-grid--2">
+            {CAPABILITIES.map((c, i) => (
+              <article key={c.n} className="cz-card cz-reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+                <span className="cz-card-no">{c.n}</span>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+                <ul>
+                  {c.points.map((p) => <li key={p}>{p}</li>)}
+                </ul>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ===== Process ===== */}
-      <section id="process" className="lt-section">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">Our Workflow</span>
-            <h2>Expertly Crafted Laboratory Solutions</h2>
+      {/* Products */}
+      <section id="products" className="cz-section cz-section--alt">
+        <div className="cz-container">
+          <div className="cz-heading cz-reveal">
+            <span className="cz-eyebrow">Products &amp; Systems</span>
+            <h2>Laboratory furniture and safety systems</h2>
           </div>
-          <div className="lt-grid lt-grid--3 lt-process">
-            {PROCESS.map((p, i) => (
-              <article
-                key={p.no}
-                className="lt-step lt-reveal"
-                style={{ transitionDelay: `${i * 150}ms` }}
-              >
-                <div className="lt-step-img">
-                  <img src={p.img} alt={p.title} loading="lazy" />
-                  <span className="lt-step-no">{p.no}</span>
-                </div>
+          <div className="cz-grid cz-grid--3">
+            {PRODUCTS.map((p, i) => (
+              <article key={p.title} className="cz-product cz-reveal" style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
+                <span className="cz-tag">{p.tag}</span>
                 <h3>{p.title}</h3>
                 <p>{p.text}</p>
+                <a href="#contact" className="cz-link">Enquire &rarr;</a>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== Offerings ===== */}
-      <section className="lt-section lt-section--alt">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">Comprehensive Lab Solutions</span>
-            <h2>Empowering Laboratories with Turnkey Expertise</h2>
+      {/* Industries */}
+      <section id="industries" className="cz-section">
+        <div className="cz-container">
+          <div className="cz-heading cz-reveal">
+            <span className="cz-eyebrow">Industries We Serve</span>
+            <h2>Laboratories for every sector</h2>
           </div>
-          <div className="lt-grid lt-grid--3">
-            {OFFERINGS.map((o, i) => (
-              <a
-                href="#contact"
-                key={o.title}
-                className="lt-offer lt-reveal lt-zoom"
-                style={{ transitionDelay: `${(i % 3) * 100}ms` }}
-              >
-                <img src={o.img} alt={o.title} loading="lazy" />
-                <div className="lt-offer-overlay">
-                  <span>{o.sub}</span>
-                  <h3>{o.title}</h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Clients ===== */}
-      <section className="lt-section lt-section--tight">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">Our Partners</span>
-            <h2>Our Valued Clients and Partners</h2>
-          </div>
-        </div>
-        <div className="lt-logos">
-          <div className="lt-logos-track">
-            {[...CLIENT_LOGOS, ...CLIENT_LOGOS, ...CLIENT_LOGOS].map((src, i) => (
-              <div className="lt-logo-item" key={i}>
-                <img src={src} alt="Client logo" loading="lazy" />
+          <div className="cz-industries">
+            {INDUSTRIES.map((x, i) => (
+              <div key={x.title} className="cz-industry cz-reveal" style={{ transitionDelay: `${i * 70}ms` }}>
+                <h3>{x.title}</h3>
+                <p>{x.text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== FAQ ===== */}
-      <section id="faq" className="lt-section lt-section--alt">
-        <div className="lt-container lt-split">
-          <div className="lt-split-text lt-reveal lt-from-left">
-            <span className="lt-eyebrow">Our Story</span>
-            <h2>Empowering Scientific Discovery through Innovative Laboratory Solutions</h2>
-            <div className="lt-faq">
-              {FAQS.map((f, i) => (
-                <div key={f.q} className={`lt-faq-item ${openFaq === i ? "lt-faq-item--open" : ""}`}>
-                  <button onClick={() => setOpenFaq(openFaq === i ? -1 : i)}>
-                    <span>{i + 1}. {f.q}</span>
-                    <i>{openFaq === i ? "−" : "+"}</i>
-                  </button>
-                  <div className="lt-faq-body">
-                    <p>{f.a}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Process */}
+      <section id="process" className="cz-section cz-section--dark">
+        <div className="cz-container">
+          <div className="cz-heading cz-heading--light cz-reveal">
+            <span className="cz-eyebrow cz-eyebrow--light">Project Process</span>
+            <h2>A clear path from enquiry to handover</h2>
           </div>
-          <div className="lt-split-media lt-reveal lt-from-right">
-            <img src={`${BASE}/why-choose-01.webp`} alt="Laboratory design" loading="lazy" />
-            <img src={`${BASE}/thump4.webp`} alt="Laboratory workspace" loading="lazy" />
+          <ol className="cz-steps">
+            {PROCESS.map((s, i) => (
+              <li key={s.n} className="cz-step cz-reveal" style={{ transitionDelay: `${i * 90}ms` }}>
+                <span>{s.n}</span>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Standards + About */}
+      <section id="about" className="cz-section">
+        <div className="cz-container cz-split">
+          <div className="cz-reveal">
+            <span className="cz-eyebrow">About {COMPANY.name}</span>
+            <h2>Manufacturing roots, laboratory focus</h2>
+            <p className="cz-lead">{COMPANY.heritage}</p>
+            <p>
+              Chameza Enterprises was started as a new venture to bring that metal fabrication experience to
+              laboratory solutions, alongside economical office furniture and pharma products. Today the group
+              supplies laboratory furniture, fume hoods and turnkey design services to research, medical and
+              industrial facilities.
+            </p>
+            <a href="#contact" className="cz-btn cz-btn--primary">Discuss Your Project</a>
+          </div>
+          <div className="cz-standards cz-reveal">
+            <h3>Design principles on every project</h3>
+            <ul>
+              {STANDARDS.map((s) => <li key={s}>{s}</li>)}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* ===== Contact ===== */}
-      <section id="contact" className="lt-section lt-contact">
-        <div className="lt-container lt-contact-grid">
-          <div className="lt-contact-info lt-reveal lt-from-left">
-            <span className="lt-eyebrow lt-eyebrow--light">Send Us a Message</span>
-            <h2>Let&apos;s build your dream laboratory together</h2>
-            <p>
-              Share your requirements and our experts will get back to you with a customized plan, design and quote.
-            </p>
-            <ul>
-              <li>📞 <a href="tel:+918387997777">(+91) 8387997777</a></li>
-              <li>📍 Bangalore, Karnataka, India</li>
-              <li>🌐 <a href="https://labturnkey.in" target="_blank" rel="noreferrer">labturnkey.in</a></li>
+      {/* Contact */}
+      <section id="contact" className="cz-section cz-contact">
+        <div className="cz-container cz-contact-grid">
+          <div className="cz-reveal">
+            <span className="cz-eyebrow cz-eyebrow--light">Contact</span>
+            <h2>Tell us about your laboratory</h2>
+            <p>Share your requirement and our team will respond with a suitable layout approach and quotation.</p>
+            <ul className="cz-contact-list">
+              <li><b>Address</b>{COMPANY.city}</li>
+              <li><b>Phone</b><a href={COMPANY.phoneHref}>{COMPANY.phone}</a></li>
+              <li><b>Email</b><a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a></li>
+              <li><b>Website</b><a href={COMPANY.website} target="_blank" rel="noreferrer">chameza.in</a></li>
             </ul>
           </div>
-          <div className="lt-contact-card lt-reveal lt-from-right">
-            <h3>Send Us Message</h3>
+          <div className="cz-contact-card cz-reveal">
+            <h3>Request a Quote</h3>
             <ContactForm id="main" />
           </div>
         </div>
       </section>
 
-      {/* ===== Testimonials ===== */}
-      <section className="lt-section">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">What Our Clients Say</span>
-            <h2>Our Experience and Professionalism</h2>
-          </div>
-          <div className="lt-grid lt-grid--3">
-            {TESTIMONIALS.map((t, i) => (
-              <figure
-                key={t.name}
-                className="lt-testimonial lt-tilt lt-reveal"
-                style={{ transitionDelay: `${i * 120}ms` }}
-              >
-                <div className="lt-stars">★★★★★</div>
-                <blockquote>{t.text}</blockquote>
-                <figcaption>
-                  <img src={t.img} alt={t.name} loading="lazy" />
-                  <div>
-                    <strong>{t.name}</strong>
-                    <span>{t.role}</span>
-                  </div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Marquee ===== */}
-      <div className="lt-marquee">
-        <div className="lt-marquee-track">
-          {[...MARQUEE_WORDS, ...MARQUEE_WORDS].map((w, i) => (
-            <span key={i}>{w}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* ===== Blog ===== */}
-      <section id="blog" className="lt-section">
-        <div className="lt-container">
-          <div className="lt-heading lt-reveal">
-            <span className="lt-eyebrow">Our Blog</span>
-            <h2>Stay Up-to-Date with Our Latest Insights</h2>
-          </div>
-          <div className="lt-grid lt-grid--3">
-            {BLOGS.map((b, i) => (
-              <article
-                key={b.title}
-                className="lt-blog lt-reveal"
-                style={{ transitionDelay: `${i * 120}ms` }}
-              >
-                <div className="lt-blog-img">
-                  <img src={b.img} alt={b.title} loading="lazy" />
-                </div>
-                <div className="lt-blog-body">
-                  <time>{b.date}</time>
-                  <h3>{b.title}</h3>
-                  <a href="#blog" className="lt-link">Read More →</a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Footer ===== */}
-      <footer className="lt-footer">
-        <div className="lt-container lt-footer-grid">
-          <div>
-            <img src={`${BASE}/labturnkey-logo.webp`} alt="Labturnkey" className="lt-footer-logo" />
-            <p>
-              Designing, manufacturing and installing high-quality, durable and safe furniture solutions for
-              laboratories across pharmaceuticals, research, education and industry.
-            </p>
-          </div>
-          <div>
-            <h4>Quick Links</h4>
-            {NAV_LINKS.map((l) => (
-              <a key={l.href} href={l.href}>{l.label}</a>
-            ))}
-          </div>
-          <div>
-            <h4>Services</h4>
-            <a href="#services">Turnkey Solutions</a>
-            <a href="#services">Support Services</a>
-            <a href="#services">Planning and Safety</a>
-            <a href="#process">Our Workflow</a>
-          </div>
-          <div>
-            <h4>Contact</h4>
-            <a href="tel:+918387997777">(+91) 8387997777</a>
-            <span>Bangalore, Karnataka, India</span>
-            <a href="https://labturnkey.in" target="_blank" rel="noreferrer">labturnkey.in</a>
-          </div>
-        </div>
-        <div className="lt-footer-bottom">
-          <div className="lt-container">© {year} Labturnkey. All rights reserved.</div>
+      {/* Footer */}
+      <footer className="cz-footer">
+        <div className="cz-container cz-footer-inner">
+          <span>&copy; {year} {COMPANY.name}. All rights reserved.</span>
+          <span>{COMPANY.tagline}</span>
         </div>
       </footer>
-
-      {/* ===== Floating buttons ===== */}
-      <a href="tel:+918387997777" className="lt-float-call" aria-label="Call us">📞</a>
-      <button
-        className={`lt-top ${showTop ? "lt-top--show" : ""}`}
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Back to top"
-      >
-        ↑
-      </button>
-
-      {/* ===== Brochure popup ===== */}
-      {popupOpen && (
-        <div className="lt-popup" onClick={() => setPopupOpen(false)}>
-          <div className="lt-popup-box" onClick={(e) => e.stopPropagation()}>
-            <button className="lt-popup-close" onClick={() => setPopupOpen(false)} aria-label="Close">×</button>
-            <h3>Download Our Brochure</h3>
-            <p>Enter your details to receive our comprehensive laboratory solutions brochure.</p>
-            <ContactForm id="popup" compact />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
